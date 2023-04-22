@@ -41,52 +41,34 @@
 
 const container = document.querySelector(".cardsContainer");
 
-function setFavoritesBackground() {
-  const favorites = JSON.parse(localStorage.getItem("favorites")) || [];
-  favorites.forEach((id) => {
-    const item = document.getElementById(id);
-    if (item) {
-      item.style.backgroundColor = "red";
-      item.dataset.fav = "true";
+function setCardState() {
+  const cards = container.querySelectorAll(".card");
+  for (let i = 0; i < cards.length; i++) {
+    const id = cards[i].id;
+    const isFav = localStorage.getItem(id) === "true";
+
+    if (isFav) {
+      cards[i].style.backgroundColor = "red";
+      cards[i].dataset.fav = "true";
     }
-  });
-}
-
-function addToFavorites(id) {
-  const favorites = JSON.parse(localStorage.getItem("favorites")) || [];
-  if (!favorites.includes(id)) {
-    favorites.push(id);
-    localStorage.setItem("favorites", JSON.stringify(favorites));
   }
 }
 
-function removeFromFavorites(id) {
-  const favorites = JSON.parse(localStorage.getItem("favorites"));
-  const index = favorites.indexOf(id);
-  if (index !== -1) {
-    favorites.splice(index, 1);
-    localStorage.setItem("favorites", JSON.stringify(favorites));
+container.addEventListener("click", function (event) {
+  if (event.target.classList.contains("card")) {
+    const id = event.target.id;
+    const isFav = event.target.dataset.fav === "true";
+
+    if (!isFav) {
+      event.target.style.backgroundColor = "red";
+      localStorage.setItem(id, "true");
+      event.target.dataset.fav = "true";
+    } else {
+      event.target.style.backgroundColor = "white";
+      localStorage.removeItem(id);
+      event.target.dataset.fav = "false";
+    }
   }
-}
-
-function toggleFavorite(item) {
-  const id = item.id;
-  const isFavorite = item.dataset.fav === "true";
-
-  if (isFavorite) {
-    item.style.backgroundColor = "white";
-    item.dataset.fav = "false";
-    removeFromFavorites(id);
-  } else {
-    item.style.backgroundColor = "red";
-    item.dataset.fav = "true";
-    addToFavorites(id);
-  }
-}
-
-setFavoritesBackground();
-
-container.addEventListener("click", (event) => {
-  const clickedItem = event.target.closest(".card");
-  if (clickedItem) toggleFavorite(clickedItem);
 });
+
+setCardState();
